@@ -1,4 +1,0 @@
-# QtCreator generates too much info that I don't want to track
-dotfiles/qtcreator/.config/QtProject/
-# Ignore personal infomation stored in gitconfig (author, email)
-dotfiles/git/.gitconfig
