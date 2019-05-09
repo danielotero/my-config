@@ -117,10 +117,19 @@ bindsym XF86AudioLowerVolume  exec --no-startup-id $AUDIO_LOWER_VOLUME
 bindsym XF86AudioMute         exec --no-startup-id $AUDIO_MUTE
 bindsym XF86AudioPlay         exec --no-startup-id $AUDIO_PLAY
 bindsym XF86AudioPause        exec --no-startup-id $AUDIO_PAUSE
+bindsym XF86AudioStop         exec --no-startup-id $AUDIO_STOP
 bindsym XF86AudioNext         exec --no-startup-id $AUDIO_NEXT
 bindsym XF86AudioPrev         exec --no-startup-id $AUDIO_PREV
-bindsym XF86AudioStop         exec --no-startup-id $AUDIO_STOP
 bindsym XF86ScreenSaver       exec --no-startup-id $LOCK
+# Fake ones (not all keyboards have multimedia keys)
+bindsym $MOD+Prior            exec --no-startup-id $AUDIO_RAISE_VOLUME
+bindsym $MOD+Next             exec --no-startup-id $AUDIO_LOWER_VOLUME
+bindsym $MOD+Shift+Next       exec --no-startup-id $AUDIO_MUTE
+bindsym $MOD+Insert           exec --no-startup-id $AUDIO_PLAY
+bindsym $MOD+Shift+Insert     exec --no-startup-id $AUDIO_PAUSE
+bindsym $MOD+Delete           exec --no-startup-id $AUDIO_STOP
+bindsym $MOD+End              exec --no-startup-id $AUDIO_NEXT
+bindsym $MOD+Home             exec --no-startup-id $AUDIO_PREV
 
 #------------------------------------------------------------------------------
 # Special modes
