@@ -28,6 +28,9 @@ set expandtab shiftwidth=2 softtabstop=2
 " Special indent for python
 autocmd FileType python setlocal shiftwidth=4 tabstop=4
 
+""" Disable mouse visual mode
+set mouse=""
+
 """ Shift-tab for 'de-tab'
 nnoremap <S-Tab> <<
 inoremap <S-Tab> <C-d>
