@@ -7,6 +7,6 @@ rofi.kb-mode-previous:       Shift+Tab,ISO_Left_Tab
 rofi.combi-hide-mode-prefix: true
 rofi.hide-scrollbar:         true
 
-/* Disable Tab related keys */
+/* Disable conflicting keys */
 rofi.kb-row-tab:
-rofi.kb-row-up:
+rofi.kb-row-up:              Up
