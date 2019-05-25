@@ -46,7 +46,3 @@ fi
 # vte3 based terminal
 bindkey ';5C' emacs-forward-word
 bindkey ';5D' emacs-backward-word
-
-# Linux virtual terminal
-bindkey '^[[C' emacs-forward-word
-bindkey '^[[D' emacs-backward-word
