@@ -1,4 +1,6 @@
-unsetopt beep
+setopt nobeep
+setopt notify
+setopt autoparamslash
 
 TIMEFMT=$'---\n%J\n---\n'\
 $'%U user, %S system, %P cpu, %*E total\n'\
