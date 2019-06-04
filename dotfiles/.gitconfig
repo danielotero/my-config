@@ -1,34 +1,34 @@
 [alias]
-	append = !git add -A && git commit --amend --no-edit
-	br = branch
-	ci = commit
-	co = checkout
-	format = clang-format
-	last = log -1 HEAD
-	rprune = "!f() { git fetch -p && git branch --list --format \"%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)\" | xargs --no-run-if-empty git branch -d; }; f"
-	st = status
-	unstage = reset HEAD --
-	view = log --pretty=tabular --graph --all --date-order
+    append = !git add -A && git commit --amend --no-edit
+    br = branch
+    ci = commit
+    co = checkout
+    format = clang-format
+    last = log -1 HEAD
+    rprune = "!f() { git fetch -p && git branch --list --format \"%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)\" | xargs --no-run-if-empty git branch -d; }; f"
+    st = status
+    unstage = reset HEAD --
+    view = log --pretty=tabular --graph --all --date-order
 [core]
-	editor = vim
+    editor = vim
 [credential]
-	helper = /usr/lib/git-core/git-credential-libsecret
+    helper = /usr/lib/git-core/git-credential-libsecret
 [diff]
-	tool = meld
+    tool = meld
 [difftool]
-	prompt = false
+    prompt = false
 [difftool "meld"]
-	cmd = meld "$LOCAL" "$REMOTE"
+    cmd = meld "$LOCAL" "$REMOTE"
 [merge]
-	conflictstyle = diff3
-	tool = meld
+    conflictstyle = diff3
+    tool = meld
 [mergetool]
-	prompt = false
+    prompt = false
 [mergetool "meld"]
-	cmd = meld "$LOCAL" "$BASE" "$REMOTE" --output "$MERGED"
+    cmd = meld "$LOCAL" "$BASE" "$REMOTE" --output "$MERGED"
 [pretty]
-	tabular = format:%>|(22,trunc)%C(auto,yellow)%h %C(auto,reset)%<(52,trunc)%s %C(auto,green)%<(15,trunc)%aN %>(13,trunc)%C(auto,blue)%ar%C(auto,red)%gd%d
+    tabular = format:%>|(22,trunc)%C(auto,yellow)%h %C(auto,reset)%<(52,trunc)%s %C(auto,green)%<(15,trunc)%aN %>(13,trunc)%C(auto,blue)%ar%C(auto,red)%gd%d
 [push]
-	default = simple
+    default = simple
 [status]
-	submodulesummary = 1
+    submodulesummary = 1
