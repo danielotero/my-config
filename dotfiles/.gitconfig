@@ -26,7 +26,7 @@
 [mergetool]
     prompt = false
 [mergetool "meld"]
-    cmd = meld "$LOCAL" "$BASE" "$REMOTE" --output "$MERGED"
+    cmd = meld "$LOCAL" "$MERGED" "$REMOTE"
 [pretty]
     tabular = format:%>|(22,trunc)%C(auto,yellow)%h %C(auto,reset)%<(52,trunc)%s %C(auto,green)%<(15,trunc)%aN %>(13,trunc)%C(auto,blue)%ar%C(auto,red)%gd%d
 [push]
