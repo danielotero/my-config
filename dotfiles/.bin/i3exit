@@ -1,34 +1,35 @@
 #!/bin/sh
 
+# TODO: TERM every desktop application individually, and wait some time for them
+#       to quit. KILL and shutdown/reboot later.
+
 set -e
 
 color=000000
 
 if [ "${SWAYSOCK}" ]; then
     capture="grim"
-    lock="swaylock -f"
+    lock="swaylock"
     quit="swaymsg exit"
 else
     capture="scrot"
-    lock="i3lock"
+    lock="i3lock -n"
     quit="i3-msg exit"
 fi
 
 lock() {
+    echo "[i3exit] Locking screen"
     if command -v $capture > /dev/null && command -v convert > /dev/null; then
         umask 0177
         IMAGE_FILE=$(mktemp --tmpdir .${USER}-screenlock.XXXX.png)
         trap 'rm -f -- "${IMAGE_FILE}"' INT TERM HUP EXIT
 
-        # Delay added to remove locking artifacts
-        sleep 0.05
-
         $capture ${IMAGE_FILE}
         convert -scale 5% -scale 2000% ${IMAGE_FILE} ${IMAGE_FILE}
-        $lock -c $color -i ${IMAGE_FILE}
-    else
-        $lock -c $color
+        image_cmd="-i ${IMAGE_FILE}"
     fi
+    $lock -c $color $image_cmd
+    echo "[i3exit] Screen unlocked"
 }
 
 case "$1" in
@@ -39,10 +40,12 @@ case "$1" in
         $quit
         ;;
     suspend)
-        lock && systemctl suspend
+        lock &
+        sleep 1 && systemctl suspend
         ;;
     hibernate)
-        lock && systemctl hibernate
+        lock &
+        sleep 1 && systemctl hibernate
         ;;
     reboot)
         systemctl reboot
