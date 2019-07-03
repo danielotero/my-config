@@ -9,7 +9,7 @@
     sdiff = diff --staged
     st = status
     unstage = reset HEAD --
-    view = log --pretty=tabular --graph --all --date-order
+    view = log --pretty=view --graph --date-order
 [core]
     editor = vim
 [credential]
@@ -28,7 +28,7 @@
 [mergetool "meld"]
     cmd = meld "$LOCAL" "$MERGED" "$REMOTE"
 [pretty]
-    tabular = format:%>|(22,trunc)%C(auto,yellow)%h %C(auto,reset)%<(52,trunc)%s %C(auto,green)%<(15,trunc)%aN %>(13,trunc)%C(auto,blue)%ar%C(auto,red)%gd%d
+    view = format:%>|(22,trunc)%C(auto,yellow)%h %C(auto,reset)%<(52,trunc)%s %C(auto,green)%<(15,trunc)%aN %C(auto,blue)%ai%C(auto,red)%gd%d
 [push]
     default = simple
 [status]
