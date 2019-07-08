@@ -1,0 +1,2 @@
+# Disable VGA output by default
+output VGA-2 disable
