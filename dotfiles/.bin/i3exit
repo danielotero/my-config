@@ -21,11 +21,11 @@ lock() {
     echo "[i3exit] Locking screen"
     if command -v $capture > /dev/null && command -v convert > /dev/null; then
         umask 0177
-        IMAGE_FILE=$(mktemp --tmpdir .${USER}-screenlock.XXXX.png)
+        IMAGE_FILE="$(mktemp -u --tmpdir .${USER}-screenlock.XXXX.png)"
         trap 'rm -f -- "${IMAGE_FILE}"' INT TERM HUP EXIT
 
         $capture ${IMAGE_FILE}
-        convert -scale 5% -scale 2000% ${IMAGE_FILE} ${IMAGE_FILE}
+        convert -scale 5% -scale 2000% "${IMAGE_FILE}" "${IMAGE_FILE}"
         image_cmd="-i ${IMAGE_FILE}"
     fi
     $lock -c $color $image_cmd
