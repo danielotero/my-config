@@ -15,6 +15,7 @@ input * {
 
 # Wayland applications rules
 for_window [app_id="gnome-calculator"] floating enable
+for_window [app_id="firefox"] move container to workspace $WS_WEB; workspace $WS_WEB
 
 # Custom host configuration
 include ~/.config/sway/`hostname`

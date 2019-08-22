@@ -222,7 +222,6 @@ for_window [class="QtCreator"] move container to workspace $WS_IDE; workspace $W
 set $WS_WEB                   "Web"
 bindsym $MOD+w                workspace $WS_WEB
 bindsym $MOD+Shift+w          move container to workspace $WS_WEB
-for_window [app_id="firefox"] move container to workspace $WS_WEB; workspace $WS_WEB
 for_window [class="Firefox"]  move container to workspace $WS_WEB; workspace $WS_WEB
 for_window [class="Chromium"] move container to workspace $WS_WEB; workspace $WS_WEB
 
