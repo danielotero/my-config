@@ -8,8 +8,11 @@
     last = log -1 HEAD
     replay = "!f() { if [ -z \"${1##*\\.\\.*}\" ]; then for rev in $(git rev-list --topo-order --reverse --no-walk=unsorted \"$@\"); do export GIT_COMMITTER_DATE=\"$(git show -s --format='%ct' $rev)\"; export GIT_COMMITTER_NAME=\"$(git show -s --format='%cn' $rev)\"; export GIT_COMMITTER_EMAIL=\"$(git show -s --format='%ce' $rev)\"; git cherry-pick $rev; done; else echo \"fatal: only '<commit>..<commit>' notation is currently supported\" && return 1; fi  }; f"
     rprune = "!f() { git fetch -p && git branch --list --format \"%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)\" | xargs --no-run-if-empty git branch -d; }; f"
-    sdiff = diff --staged
+    rs = restore
+    df = diff
+    dfs = diff --staged
     st = status
+    sw = switch
     unstage = reset HEAD --
     view = log --pretty=view --graph --date-order
 [core]
