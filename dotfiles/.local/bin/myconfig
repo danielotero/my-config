@@ -1,0 +1,392 @@
+#!/usr/bin/env bash
+
+#
+# Script to manage my dotfiles. It should only do one thing: keep dotfiles
+# updated with the git repo as it changes.
+#
+# It has options to print what it's doing (--verbose), to ask before doing
+# anything (--interactive) and some other things. But it should be simple
+# enough that you should be able to read it. Do so!
+#
+# Be careful: the paths are not parametrized and are tied to the script
+# location on the repo.
+#
+
+# Enable zero matches and hidden files
+shopt -s globstar dotglob
+
+# The configuration folder
+MYCFG_CFG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/myconfig"
+# The real location of this script
+MYCFG_SCRIPT="$(realpath -- "${BASH_SOURCE[0]}")"
+# The location of the myconfig root (<dir>/dotfiles/.local/bin/<script>)
+MYCFG_DIR="$(realpath -- "$(dirname -- "$MYCFG_SCRIPT")/../../..")"
+# The location of the dotfiles to install
+MYCFG_DTFL_SRC="$MYCFG_DIR/dotfiles"
+# Destination where all the links will be installed
+MYCFG_DTFL_DST="$HOME"
+# File with all the changes done (to be able to update/uninstall)
+MYCFG_DTFL_FILE="$MYCFG_CFG_DIR/dotfiles"
+# Temporal file to write intermediate results
+MYCFG_DTFL_TMP_FILE="$MYCFG_CFG_DIR/.dotfiles"
+
+# Control variables
+DRY_RUN=0
+INTERACTIVE=0
+FORCE=0
+VERBOSE=0
+MODE=status
+
+###############################################################################
+#                              Common functions                               #
+###############################################################################
+# Prints an error and exits
+function _err() {
+    >&2 echo "error: $@"
+    exit 1
+}
+
+# Prints a message only on debug
+function _msg() {
+    if [[ $VERBOSE == 1 ]]; then
+        echo "$@"
+    fi
+}
+
+# Run (if not DRY_RUN) a command and exit if it fails
+function _run() {
+    if [[ $VERBOSE == 1 ]] || [[ $INTERACTIVE == 1 ]]; then
+        >&2 echo "$ $@"
+    fi
+
+    if [[ $DRY_RUN == 0 ]]; then
+        if [[ $INTERACTIVE == 1 ]]; then
+            echo -n "Exec? (Yes/No/Quit) "
+            read ans
+            case "$ans" in
+                y|yes)
+                    ;;
+                n|no)
+                    return
+                    ;;
+                q|quit)
+                    exit 0
+                    ;;
+                *)
+                    _err "invalid answer \"$ans\""
+                    ;;
+            esac
+        fi
+        "$@"
+     
+        if [[ $? != 0 ]]; then
+            _err "exiting due to command failure"
+        fi
+    fi
+}
+
+###############################################################################
+#                             Dotfiles functions                              #
+###############################################################################
+# Register a installed file on the temporal database
+function _register_installed_file() {
+    echo "$MYCFG_DTFL_DST/$1" >> "$MYCFG_DTFL_TMP_FILE"
+}
+
+# Verifies that a file is correctly pointing to the dotfiles
+function _validate_file() {    
+    if [[ ! -a "$MYCFG_DTFL_DST/$1" ]]; then
+        echo 1 # Not installed
+    elif [[ ! -h "$MYCFG_DTFL_DST/$1" ]]; then
+        echo 2 # It is not a symlink
+    else
+        local origin="$(realpath -- "$1")"
+        local target="$(realpath -- "$MYCFG_DTFL_DST/$1")"
+
+        if [[ "$origin" == "$target" ]]; then
+            echo 0 # Correct
+        elif [[ "${target##$MYCFG_DTFL_SRC}" != "${target}" ]]; then
+            echo 3 # Points to another file in the dotfiles folder
+        else
+            echo 4 # Does not point to the right direction
+        fi
+    fi
+}
+
+# "Install" a link to a file
+#
+# This function must be called from the MYCFG_DTFL_SRC folder and the first
+# argument must be the relative path to install.
+function _install_link() {
+    local dest="$MYCFG_DTFL_DST/$1"
+    local destdir="$(dirname "$dest")"
+
+    _msg "Installing '$1' in '$dest'"
+
+    # Create the destination folder if needed
+    if ! [[ -d "$destdir" ]]; then
+        _run mkdir --parents -- "$destdir"
+    fi
+
+    local linkptr="$(realpath --strip --relative-to="$destdir" -- "$1")"
+
+    # Create the actual symlink
+    if [[ $FORCE == 1 ]]; then
+        _run ln --symbolic --force "$linkptr" "$dest"
+    elif [[ -e "$dest" ]]; then
+        _err "refusing to install over an existing file: "$dest""
+    else
+        _run ln --symbolic "$linkptr" "$dest"    
+    fi
+
+    _register_installed_file "$1"
+}
+
+# Removes a file and the parent folders if empty
+function _remove_file {
+    local destdir="$(dirname "$1")"
+
+    _msg "Removing '$1'"
+
+    # Remove the file
+    if [[ $FORCE == 1 ]]; then
+        _run rm --force -- "$1"
+    elif [[ -h "$1" ]]; then
+        _run rm -- "$1"
+    elif [[ -e "$1" ]]; then
+        _err "refusing the remove a non symbolic link (use -f instead)"
+    fi
+
+    # Remove the containing directory if empty
+    if [[ "$destdir" != "$MYCFG_DTFL_DST" ]]; then
+        _run rmdir --parents --ignore-fail-on-non-empty -- "$destdir"
+    fi
+}
+
+function _dotfiles_lost {
+    grep --line-regexp --invert-match --fixed-strings \
+         --file="$MYCFG_DTFL_TMP_FILE" "$MYCFG_DTFL_FILE"
+}
+
+function dotfiles_uninstall() {
+    if ! [[ -e "$MYCFG_DTFL_FILE" ]]; then
+        _err "no previous installation detected"
+    fi
+
+    # Enter in the dotfiles source directory
+    pushd "$MYCFG_DTFL_SRC" > /dev/null
+
+    while IFS="" read -r item; do
+        _remove_file "$item"
+    done <"$MYCFG_DTFL_FILE"
+
+    popd > /dev/null
+}
+
+function dotfiles_update() {
+    if ! [[ -e "$MYCFG_DTFL_FILE" ]]; then
+        touch "$MYCFG_DTFL_FILE"
+    fi
+
+    # Enter in the dotfiles source directory
+    pushd "$MYCFG_DTFL_SRC" > /dev/null
+
+    for item in **/*; do
+        if [[ ! -d "$item" ]]; then
+            if [[ $FORCE == 1 ]]; then
+                _install_link "$item"
+                continue
+            fi
+
+            case "$(_validate_file "$item")" in
+                0)
+                    _msg "File '$item' is already correctly instaled"
+                    _register_installed_file "$item"
+                    ;;
+                1) # Not installed
+                    _install_link "$item"
+                    ;;
+                2) # It is not a symlink
+                    _err "\"$item\" already exist on destination"
+                    ;;
+                3) # Points to another file in the dotfiles folder
+                    _remove_file "$item"
+                    _install_link "$item"
+                    ;;
+                4) # Does not point to the right direction
+                    _err "\"$item\" points to a different location"
+                    ;;
+                *)
+                    _err "unexpected value from '_validate_file'"
+            esac
+        fi
+    done
+
+    # Remove the previously installed files that are not installed now
+    while IFS="" read -r item; do
+        _remove_file "$item"
+    done < <( _dotfiles_lost )
+
+    popd > /dev/null
+}
+
+function dotfiles_check() {
+    # Enter in the dotfiles source directory
+    pushd "$MYCFG_DTFL_SRC" > /dev/null
+
+    for item in **/*; do
+        if [[ -f "$item" ]]; then
+            case "$(_validate_file "$item")" in
+                1) # Not installed
+                    _err "\"$item\" is not installed"
+                    ;;
+                2) # It is not a symlink
+                    _err "\"$item\" already exist on destination"
+                    ;;
+                3|4) # Does not point to the right direction
+                    _err "\"$item\" points to a different location"
+                    ;;
+                0) # Correct
+                    _msg "\"$item\" is correctly installed"
+                    _register_installed_file "$item"
+                    ;;
+            esac
+        fi
+    done
+
+    while IFS="" read -r item; do
+        if [[ -h "$item" ]]; then
+            _err "\"$item\" is gone but still is registered"
+        fi
+    done < <( _dotfiles_lost )
+
+    popd > /dev/null
+}
+
+###############################################################################
+#                              Global functions                               #
+###############################################################################
+function myconfig_version() {
+    local version="$(_run git -C "$MYCFG_DIR" describe --always --dirty)"
+    echo "Version: $version"
+    echo "Installation dir: $MYCFG_DIR"
+    echo "Configuration dir: $MYCFG_CFG_DIR"
+}
+
+function myconfig_usage() {
+    cat << EOF
+usage: myconfig [-n | --dry-run] [-i | --interactive]
+                [-f | --force] [-v | --verbose] [-h | --help]
+                [-V | --version] <command>
+
+Where <command> can be:
+    install         Fresh installation of my configuration
+    uninstall       Remove all the previously installed dotfiles
+    update          Install new and remove old dotfiles
+    status          Validate the current installation of dotfiles
+EOF
+}
+
+function myconfig_parseargs() {
+    local optspec="hnfivV-:"
+    local mode=""
+    while [[ "$@" ]]; do
+        if [[ $1 =~ ^- ]]; then
+            OPTIND=1
+            while getopts "$optspec" optchar; do
+                case "$optchar" in
+                    # Long options
+                    -)
+                        case "$OPTARG" in
+                            help) 
+                                myconfig_usage
+                                exit 0
+                                ;;
+                            dry-run)
+                                DRY_RUN=1
+                                ;;
+                            force)
+                                FORCE=1
+                                ;;
+                            interactive)
+                                INTERACTIVE=1
+                                ;;
+                            verbose)
+                                VERBOSE=1
+                                ;;
+                            version)
+                                myconfig_version
+                                exit 0
+                                ;;
+                            *)
+                                _err "parameter not recognized: --$OPTARG"
+                                ;;
+                        esac
+                        ;;
+                    # Short options
+                    h)  myconfig_usage
+                        exit 0
+                        ;;
+                    n)  DRY_RUN=1
+                        ;;
+                    f)  FORCE=1
+                        ;;
+                    i)  INTERACTIVE=1
+                        ;;
+                    v)  VERBOSE=1
+                        ;;
+                    V)  myconfig_version
+                        exit 0
+                        ;;
+                    *)  _err "parameter not recognized: -$OPTARG"
+                        ;;
+                esac
+            done
+        elif [[ -z "$mode" ]]; then
+            mode="$1"
+        else
+            _err "parameter not recognized: $1"
+        fi
+        shift
+    done
+
+    if [[ "$mode" ]]; then
+        MODE="$mode"
+    fi
+}
+
+if [ "$0" = "$BASH_SOURCE" ]; then
+    myconfig_parseargs "$@"
+    
+    # Remove the backup file at exit
+    trap "rm --force -- "$MYCFG_DTFL_TMP_FILE"" err exit
+
+    case "$MODE" in
+        install)
+            # Create the configuration folder first
+            if [[ ! -a "$MYCFG_CFG_DIR" ]]; then
+                _run mkdir --parents "$MYCFG_CFG_DIR"
+            fi
+
+            dotfiles_update
+            # Persist the database
+            _run mv "$MYCFG_DTFL_TMP_FILE" "$MYCFG_DTFL_FILE"
+            ;;
+        uninstall)
+            dotfiles_uninstall
+            _run rm "$MYCFG_DTFL_FILE"
+            _run rmdir "$MYCFG_CFG_DIR"
+            ;;
+        update)
+            dotfiles_update
+            # Persist the database
+            _run mv "$MYCFG_DTFL_TMP_FILE" "$MYCFG_DTFL_FILE"
+            ;;
+        status)
+            dotfiles_check
+            ;;
+        *) 
+            _err "invalid mode provided (use -h for help)"
+            ;;
+    esac
+fi
