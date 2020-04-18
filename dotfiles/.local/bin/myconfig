@@ -29,6 +29,10 @@ MYCFG_DTFL_DST="$HOME"
 MYCFG_DTFL_FILE="$MYCFG_CFG_DIR/dotfiles"
 # Temporal file to write intermediate results
 MYCFG_DTFL_TMP_FILE="$MYCFG_CFG_DIR/.dotfiles"
+# Temporal file to write intermediate results
+MYCFG_PKG_TMP_FILE="$MYCFG_CFG_DIR/.packages"
+# The AUR helper to use
+MYCFG_PKG_AURHELPER="pikaur"
 
 # Control variables
 DRY_RUN=0
@@ -50,6 +54,14 @@ function _err() {
 function _msg() {
     if [[ $VERBOSE == 1 ]]; then
         echo "$@"
+    fi
+}
+
+# checks that a binary is installed or exists if not
+function _verify_dependecy() {
+    type -f "$1" &> /dev/null
+    if [[ $? != 0 ]]; then
+        _err "'$1' must be installed to continue"
     fi
 }
 
@@ -82,6 +94,16 @@ function _run() {
         if [[ $? != 0 ]]; then
             _err "exiting due to command failure"
         fi
+    fi
+}
+
+# Run (if not DRY_RUN) a command and exit if it fails
+function _adm_run() {
+    if [[ $UID == 0 ]]; then
+        _run "$@"
+    else
+        _verify_dependecy "sudo"
+        _run sudo "$@"
     fi
 }
 
@@ -264,6 +286,91 @@ function dotfiles_check() {
 }
 
 ###############################################################################
+#                             Packages functions                              #
+###############################################################################
+function _init_package_system() {
+    # Detect if the AUR helper is installed
+    type -f "$MYCFG_PKG_AURHELPER" &> /dev/null
+    if [[ $? != 0 ]]; then
+        unset MYCFG_PKG_AURHELPER
+    fi
+
+    _msg "Updating the database"
+    _adm_run pacman -Syu
+
+    # Register all installed packages in the temporal file for later queries
+    pacman -Q | cut -f1 -d' ' > "$MYCFG_PKG_TMP_FILE"
+    if [[ ! -f "$MYCFG_PKG_TMP_FILE" ]]; then
+        _err "couldn't cache the installed packages"
+    fi
+}
+
+# Install packages using the AUR helper if installed
+function _install_packages() {
+    if [[ "$MYCFG_PKG_AURHELPER" ]]; then
+        _run "$MYCFG_PKG_AURHELPER" -S --needed "$@"
+    else
+        _adm_run pacman -S --needed "$@"
+    fi
+}
+
+# Reads the given file and filters out comments, empty lines and AUR packages
+# (if no helper is installed)
+function _bundle_to_packages() {
+    local file="$1"
+
+    if [[ "$MYCFG_PKG_TMP_FILE" ]]; then
+        grep -E -v '^#|^$' "${file}" | sed 's|^aur/||'
+    else
+        grep -E -v '^#|^$|^aur/' "${file}"
+    fi
+}
+
+# Reads a list of packages from the given file and outputs only the installed ones
+function _non_installed_packages() {
+    grep --line-regexp --invert-match --fixed-strings \
+         --file="$MYCFG_PKG_TMP_FILE" < <( _bundle_to_packages "$1" )
+}
+
+function package_install() {
+    _init_package_system
+    local total_packages=()
+
+    for bundle in "$MYCFG_DIR/packages/"*; do
+        local packages=$( _non_installed_packages "$bundle" )
+
+        while [[ "$packages" ]]; do
+            echo -n "Do you like to install the \"$(basename "$bundle")\" bundle? (Yes/No/List/Quit) "
+            read ans
+            case "$ans" in
+                y|yes)
+                    total_packages+=${packages[@]}
+                    ;;
+                n|no)
+                    ;;
+                l|list)
+                    echo "$packages"
+                    continue
+                    ;;
+                q|quit)
+                    exit 0
+                    ;;
+                *)
+                    _err "invalid answer \"$ans\""
+                    ;;
+            esac
+
+            # We just want to loop to re-query, otherwise break
+            break
+        done
+    done
+
+    if [[ ${#total_packages[@]} != 0 ]]; then
+        _install_packages ${total_packages[@]}
+    fi
+}
+
+###############################################################################
 #                              Global functions                               #
 ###############################################################################
 function myconfig_version() {
@@ -359,7 +466,7 @@ if [ "$0" = "$BASH_SOURCE" ]; then
     myconfig_parseargs "$@"
     
     # Remove the backup file at exit
-    trap "rm --force -- "$MYCFG_DTFL_TMP_FILE"" err exit
+    trap "rm --force -- "$MYCFG_DTFL_TMP_FILE" "$MYCFG_PKG_TMP_FILE"" err exit
 
     case "$MODE" in
         install)
@@ -368,6 +475,7 @@ if [ "$0" = "$BASH_SOURCE" ]; then
                 _run mkdir --parents "$MYCFG_CFG_DIR"
             fi
 
+            package_install
             dotfiles_update
             # Persist the database
             _run mv "$MYCFG_DTFL_TMP_FILE" "$MYCFG_DTFL_FILE"
