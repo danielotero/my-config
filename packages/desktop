@@ -22,3 +22,5 @@ polkit-gnome
 pulseaudio
 pavucontrol
 
+# Eye candy
+zsh-theme-powerlevel10k
