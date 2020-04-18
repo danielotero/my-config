@@ -6,7 +6,7 @@ set $UP                       Up
 set $RIGHT                    Right
 
 # Commands
-set $TERM                     gnome-terminal
+set $TERM                     alacritty
 set $MENU                     rofi -show combi
 set $EXIT                     i3exit logout
 set $SHUTDOWN                 i3exit shutdown

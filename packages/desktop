@@ -11,7 +11,7 @@ imagemagick
 rofi
 
 # Terminal emulator
-termite
+alacritty
 
 # Security
 gnome-keyring
