@@ -29,6 +29,10 @@ MYCFG_DTFL_DST="$HOME"
 MYCFG_DTFL_FILE="$MYCFG_CFG_DIR/dotfiles"
 # Temporal file to write intermediate results
 MYCFG_DTFL_TMP_FILE="$MYCFG_CFG_DIR/.dotfiles"
+# The location of the sysfiles to install
+MYCFG_SYSFL_SRC="$MYCFG_DIR/sysfiles"
+# Prefix for the destination where to install the sysfiles
+MYCFG_SYSFL_SYSROOT=""
 # Temporal file to write intermediate results
 MYCFG_PKG_TMP_FILE="$MYCFG_CFG_DIR/.packages"
 # The AUR helper to use
@@ -286,6 +290,74 @@ function dotfiles_check() {
 }
 
 ###############################################################################
+#                             Sysfiles functions                              #
+###############################################################################
+# "Install" a system file
+#
+# This function must be called from the MYCFG_DTFL_SRC folder and the first
+# argument must be the relative path to install.
+function _install_file() {
+    local source="$1"
+    local dest="$2"
+    local destdir="$(dirname -- "$dest")"
+
+    _msg "Installing '$1' in '$dest'"
+
+    # Create the dir if it doesn't exists
+    if [[ ! -d "$destdir" ]]; then
+        _adm_run mkdir --parents -- "$destdir"
+    fi
+    _adm_run cp "$source" "$dest"
+}
+
+function sysfiles_install() {
+    pushd "$MYCFG_SYSFL_SRC" > /dev/null
+
+    for item in **/*; do
+        if [[ -d "$item" ]]; then
+            continue
+        fi
+
+        local dest="$MYCFG_SYSFL_SYSROOT/$item"
+
+        while true; do
+            if [[ -a "$dest" ]]; then
+                echo -n "Do you like to overwrite the \"$dest\" system file? (Yes/No/Show/Diff/Quit) "
+            else
+                echo -n "Do you like to install the \"$dest\" system file? (Yes/No/Show/Quit) "
+            fi
+            read ans
+            case "$ans" in
+                y|yes)
+                    _install_file "$item" "$dest"
+                    ;;
+                n|no)
+                    ;;
+                s|show)
+                    cat "$item"
+                    continue
+                    ;;
+                d|diff)
+                    diff -U 5 --color "$item" "$dest"
+                    continue
+                    ;;
+                q|quit)
+                    exit 0
+                    ;;
+                *)
+                    _err "invalid answer \"$ans\""
+                    ;;
+            esac
+
+            # We just want to loop to re-query, otherwise break
+            break
+        done
+    done
+
+    popd > /dev/null
+}
+
+###############################################################################
 #                             Packages functions                              #
 ###############################################################################
 function _init_package_system() {
@@ -476,6 +548,7 @@ if [ "$0" = "$BASH_SOURCE" ]; then
             fi
 
             package_install
+            sysfiles_install
             dotfiles_update
             # Persist the database
             _run mv "$MYCFG_DTFL_TMP_FILE" "$MYCFG_DTFL_FILE"
