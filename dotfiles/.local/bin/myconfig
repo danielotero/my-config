@@ -78,7 +78,7 @@ function _run() {
     if [[ $DRY_RUN == 0 ]]; then
         if [[ $INTERACTIVE == 1 ]]; then
             echo -n "Exec? (Yes/No/Quit) "
-            read ans
+            read ans < /dev/tty
             case "$ans" in
                 y|yes|Y|Yes|YES)
                     ;;
