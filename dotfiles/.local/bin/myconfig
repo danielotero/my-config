@@ -80,12 +80,12 @@ function _run() {
             echo -n "Exec? (Yes/No/Quit) "
             read ans
             case "$ans" in
-                y|yes)
+                y|yes|Y|Yes|YES)
                     ;;
-                n|no)
+                n|no|N|No|NO)
                     return
                     ;;
-                q|quit)
+                q|quit|Q|Quit|QUIT)
                     exit 0
                     ;;
                 *)
@@ -328,20 +328,20 @@ function sysfiles_install() {
             fi
             read ans
             case "$ans" in
-                y|yes)
+                y|yes|Y|Yes|YES)
                     _install_file "$item" "$dest"
                     ;;
-                n|no)
+                n|no|N|No|NO)
                     ;;
-                s|show)
+                s|show|S|Show|SHOW)
                     cat "$item"
                     continue
                     ;;
-                d|diff)
+                d|diff|D|Diff|DIFF)
                     diff -U 5 --color "$item" "$dest"
                     continue
                     ;;
-                q|quit)
+                q|quit|Q|Quit|QUIT)
                     exit 0
                     ;;
                 *)
@@ -415,16 +415,16 @@ function package_install() {
             echo -n "Do you like to install the \"$(basename "$bundle")\" bundle? (Yes/No/List/Quit) "
             read ans
             case "$ans" in
-                y|yes)
+                y|yes|Y|Yes|YES)
                     total_packages+=${packages[@]}
                     ;;
-                n|no)
+                n|no|N|No|NO)
                     ;;
-                l|list)
+                l|list|L|List|LIST)
                     echo "$packages"
                     continue
                     ;;
-                q|quit)
+                q|quit|Q|Quit|QUIT)
                     exit 0
                     ;;
                 *)
