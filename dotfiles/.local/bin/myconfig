@@ -94,7 +94,7 @@ function _run() {
             esac
         fi
         "$@"
-     
+
         if [[ $? != 0 ]]; then
             _err "exiting due to command failure"
         fi
@@ -120,7 +120,7 @@ function _register_installed_file() {
 }
 
 # Verifies that a file is correctly pointing to the dotfiles
-function _validate_file() {    
+function _validate_file() {
     if [[ ! -a "$MYCFG_DTFL_DST/$1" ]]; then
         echo 1 # Not installed
     elif [[ ! -h "$MYCFG_DTFL_DST/$1" ]]; then
@@ -162,7 +162,7 @@ function _install_link() {
     elif [[ -e "$dest" ]]; then
         _err "refusing to install over an existing file: "$dest""
     else
-        _run ln --symbolic "$linkptr" "$dest"    
+        _run ln --symbolic "$linkptr" "$dest"
     fi
 
     _register_installed_file "$1"
@@ -477,7 +477,7 @@ function myconfig_parseargs() {
                     # Long options
                     -)
                         case "$OPTARG" in
-                            help) 
+                            help)
                                 myconfig_usage
                                 exit 0
                                 ;;
@@ -536,7 +536,7 @@ function myconfig_parseargs() {
 
 if [ "$0" = "$BASH_SOURCE" ]; then
     myconfig_parseargs "$@"
-    
+
     # Remove the backup file at exit
     trap "rm --force -- "$MYCFG_DTFL_TMP_FILE" "$MYCFG_PKG_TMP_FILE"" err exit
 
@@ -566,7 +566,7 @@ if [ "$0" = "$BASH_SOURCE" ]; then
         status)
             dotfiles_check
             ;;
-        *) 
+        *)
             _err "invalid mode provided (use -h for help)"
             ;;
     esac
