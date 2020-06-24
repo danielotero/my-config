@@ -416,7 +416,7 @@ function package_install() {
             read ans
             case "$ans" in
                 y|yes|Y|Yes|YES)
-                    total_packages+=${packages[@]}
+                    total_packages=(${total_packages[@]} ${packages[@]})
                     ;;
                 n|no|N|No|NO)
                     ;;
