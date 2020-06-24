@@ -166,7 +166,7 @@ bindsym $MOD+Escape           mode $MODE_SYSTEM
 #------------------------------------------------------------------------------
 # Style
 #------------------------------------------------------------------------------
-font                          pango:DejaVu Sans Mono 8
+font                          pango:fira code 9
 
 # Colors
 # class                       border    backgr.   text      indicator child_border

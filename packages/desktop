@@ -23,4 +23,6 @@ pulseaudio
 pavucontrol
 
 # Eye candy
+ttf-fira-code
+ttf-font-awesome
 zsh-theme-powerlevel10k
