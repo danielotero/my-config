@@ -454,7 +454,7 @@ function myconfig_version() {
 
 function myconfig_usage() {
     cat << EOF
-usage: myconfig [-n | --dry-run] [-i | --interactive]
+usage: myconfig [-n | --dry-run] [-d | --debug] [-i | --interactive]
                 [-f | --force] [-v | --verbose] [-h | --help]
                 [-V | --version] <command>
 
@@ -467,7 +467,7 @@ EOF
 }
 
 function myconfig_parseargs() {
-    local optspec="hnfivV-:"
+    local optspec="hdnfivV-:"
     local mode=""
     while [[ "$@" ]]; do
         if [[ $1 =~ ^- ]]; then
@@ -480,6 +480,9 @@ function myconfig_parseargs() {
                             help)
                                 myconfig_usage
                                 exit 0
+                                ;;
+                            debug)
+				set -x
                                 ;;
                             dry-run)
                                 DRY_RUN=1
@@ -506,6 +509,8 @@ function myconfig_parseargs() {
                     h)  myconfig_usage
                         exit 0
                         ;;
+		    d)  set -x
+			;;
                     n)  DRY_RUN=1
                         ;;
                     f)  FORCE=1
