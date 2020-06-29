@@ -32,7 +32,7 @@
 [mergetool "meld"]
     cmd = meld "$LOCAL" "$MERGED" "$REMOTE"
 [pretty]
-    view = format:%>|(22,trunc)%C(auto,yellow)%h %C(auto,reset)%<(52,trunc)%s %C(auto,green)%<(15,trunc)%aN %C(auto,blue)%ai%C(auto,red)%gd%d
+    view = format:%>|(30,trunc)%C(auto,yellow)%h %C(auto,reset)%<(52,trunc)%s %C(auto,green)%<(15,trunc)%aN %C(auto,blue)%ai%C(auto,red)%gd%d
 [push]
     default = simple
 [status]
