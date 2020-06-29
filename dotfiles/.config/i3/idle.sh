@@ -12,5 +12,5 @@ if [ "${SWAYSOCK}" ]; then
       resume                              'swaymsg "output * dpms on"'\
       before-sleep                        "${LOCK_CMD}"
 else
-    xautolock -locker "${LOCK_CMD}"
+    xautolock -time ${LOCK_TIMEOUT} -locker "${LOCK_CMD}"
 fi
