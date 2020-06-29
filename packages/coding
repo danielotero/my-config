@@ -19,14 +19,14 @@ perf
 cmake
 ninja
 
-# GIT
+# Version control
 git
 
 # Diff graphical utility
 meld
 
-# General purpose editor
-neovim
-
 # Python
 python3
+
+# Network
+openbsd-netcat

@@ -6,27 +6,22 @@ btrfs-progs
 snapper
 snap-pac
 
-# Version control
-git
-
 # Terminal editor
-vim
+neovim
 
 # Network management
 networkmanager
 
-# Session manager
-tmux
-
-# Proces manager
+# Process management
 htop
-
-# Open files viewer
 lsof
 
 # Remote access utilities
 openssh
-openbsd-netcat
+tmux
 
 # File synchronization
 rsync
+
+# Basic utilities
+inetutils
