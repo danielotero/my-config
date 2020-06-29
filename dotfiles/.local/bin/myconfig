@@ -542,16 +542,16 @@ function myconfig_parseargs() {
 if [ "$0" = "$BASH_SOURCE" ]; then
     myconfig_parseargs "$@"
 
+    # Create the configuration folder first
+    if [[ ! -a "$MYCFG_CFG_DIR" ]]; then
+        _run mkdir --parents "$MYCFG_CFG_DIR"
+    fi
+
     # Remove the backup file at exit
     trap "rm --force -- "$MYCFG_DTFL_TMP_FILE" "$MYCFG_PKG_TMP_FILE"" err exit
 
     case "$MODE" in
         install)
-            # Create the configuration folder first
-            if [[ ! -a "$MYCFG_CFG_DIR" ]]; then
-                _run mkdir --parents "$MYCFG_CFG_DIR"
-            fi
-
             package_install
             sysfiles_install
             dotfiles_update
