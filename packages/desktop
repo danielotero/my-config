@@ -21,6 +21,7 @@ polkit-gnome
 # Sound management
 pulseaudio
 pavucontrol
+playerctl
 
 # Eye candy
 ttf-fira-code
