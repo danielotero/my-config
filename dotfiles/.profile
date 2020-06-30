@@ -21,3 +21,11 @@ set -o allexport
 [[ -d "$HOST_ENV.d" ]] && for file in "$HOST_ENV.d/"*.env; do source "$file"; done
 unset file
 set +o allexport
+
+#
+# Keyring
+#
+if [ $(command -v gnome-keyring-daemon) ] && [ -z "$SSH_AUTH_SOCK" ]; then
+    eval $(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh)
+    export SSH_AUTH_SOCK
+fi
