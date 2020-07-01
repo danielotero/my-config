@@ -208,7 +208,7 @@ bar {
         binding_mode          #760909   #c00f0f   #bfbfbe
     }
 }
-bindsym $MOD+b                bar mode toggle
+bindsym $MOD+y                bar mode toggle
 
 #------------------------------------------------------------------------------
 # Custom workspaces
