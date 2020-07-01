@@ -43,6 +43,7 @@ DRY_RUN=0
 FORCE=0
 INTERACTIVE=0
 MODE=status
+QUIET=0
 VERBOSE=0
 
 ###############################################################################
@@ -50,13 +51,22 @@ VERBOSE=0
 ###############################################################################
 # Prints an error and exits
 function _err() {
-    >&2 echo "error: $@"
+    if [[ $QUIET == 0 ]]; then
+        >&2 echo "error: $@"
+    fi
     exit 1
 }
 
 # Prints a message only on debug
 function _msg() {
     if [[ $VERBOSE == 1 ]]; then
+        echo "$@"
+    fi
+}
+
+# Prints a message (if not quiet)
+function _info() {
+    if [[ $QUIET == 0 ]] || [[ $VERBOSE == 1 ]]; then
         echo "$@"
     fi
 }
@@ -231,6 +241,7 @@ function dotfiles_update() {
                     ;;
                 1) # Not installed
                     _install_link "$item"
+                    _info "File '$item' installed correctly"
                     ;;
                 2) # It is not a symlink
                     _err "'$item' already exist on destination"
@@ -238,6 +249,7 @@ function dotfiles_update() {
                 3) # Points to another file in the dotfiles folder
                     _remove_file "$item"
                     _install_link "$item"
+                    _info "File '$item' updated correctly"
                     ;;
                 4) # Does not point to the right direction
                     _err "'$item' points to a different location"
@@ -251,6 +263,7 @@ function dotfiles_update() {
     # Remove the previously installed files that are not installed now
     while IFS="" read -r item; do
         _remove_file "$item"
+        _info "File '$item' removed correctly"
     done < <( _dotfiles_lost )
 
     popd > /dev/null
@@ -455,8 +468,8 @@ function myconfig_version() {
 function myconfig_usage() {
     cat << EOF
 usage: myconfig [-d | --debug] [-n | --dry-run] [-f | --force]
-                [-h | --help] [-i | --interactive] [-v | --verbose]
-                [-V | --version] <command>
+                [-h | --help] [-i | --interactive] [-q | --quiet]
+                [-v | --verbose] [-V | --version] <command>
 
 Where <command> can be:
     install         Fresh installation of my configuration
@@ -467,7 +480,7 @@ EOF
 }
 
 function myconfig_parseargs() {
-    local optspec="dfhinvV-:"
+    local optspec="dfhinqvV-:"
     local mode=""
     while [[ "$@" ]]; do
         if [[ $1 =~ ^- ]]; then
@@ -493,6 +506,9 @@ function myconfig_parseargs() {
                             interactive)
                                 INTERACTIVE=1
                                 ;;
+                            quiet)
+                                QUIET=1
+                                ;;
                             verbose)
                                 VERBOSE=1
                                 ;;
@@ -516,6 +532,8 @@ function myconfig_parseargs() {
                     i)  INTERACTIVE=1
                         ;;
                     n)  DRY_RUN=1
+                        ;;
+                    q)  QUIET=1
                         ;;
                     v)  VERBOSE=1
                         ;;
