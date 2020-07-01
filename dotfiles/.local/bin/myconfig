@@ -40,10 +40,10 @@ MYCFG_PKG_AURHELPER="pikaur"
 
 # Control variables
 DRY_RUN=0
-INTERACTIVE=0
 FORCE=0
-VERBOSE=0
+INTERACTIVE=0
 MODE=status
+VERBOSE=0
 
 ###############################################################################
 #                              Common functions                               #
@@ -226,21 +226,21 @@ function dotfiles_update() {
 
             case "$(_validate_file "$item")" in
                 0)
-                    _msg "File '$item' is already correctly instaled"
+                    _msg "File '$item' is already correctly installed"
                     _register_installed_file "$item"
                     ;;
                 1) # Not installed
                     _install_link "$item"
                     ;;
                 2) # It is not a symlink
-                    _err "\"$item\" already exist on destination"
+                    _err "'$item' already exist on destination"
                     ;;
                 3) # Points to another file in the dotfiles folder
                     _remove_file "$item"
                     _install_link "$item"
                     ;;
                 4) # Does not point to the right direction
-                    _err "\"$item\" points to a different location"
+                    _err "'$item' points to a different location"
                     ;;
                 *)
                     _err "unexpected value from '_validate_file'"
@@ -454,8 +454,8 @@ function myconfig_version() {
 
 function myconfig_usage() {
     cat << EOF
-usage: myconfig [-n | --dry-run] [-d | --debug] [-i | --interactive]
-                [-f | --force] [-v | --verbose] [-h | --help]
+usage: myconfig [-d | --debug] [-n | --dry-run] [-f | --force]
+                [-h | --help] [-i | --interactive] [-v | --verbose]
                 [-V | --version] <command>
 
 Where <command> can be:
@@ -467,7 +467,7 @@ EOF
 }
 
 function myconfig_parseargs() {
-    local optspec="hdnfivV-:"
+    local optspec="dfhinvV-:"
     local mode=""
     while [[ "$@" ]]; do
         if [[ $1 =~ ^- ]]; then
@@ -477,18 +477,18 @@ function myconfig_parseargs() {
                     # Long options
                     -)
                         case "$OPTARG" in
-                            help)
-                                myconfig_usage
-                                exit 0
-                                ;;
                             debug)
-				set -x
+                                set -x
                                 ;;
                             dry-run)
                                 DRY_RUN=1
                                 ;;
                             force)
                                 FORCE=1
+                                ;;
+                            help)
+                                myconfig_usage
+                                exit 0
                                 ;;
                             interactive)
                                 INTERACTIVE=1
@@ -506,16 +506,16 @@ function myconfig_parseargs() {
                         esac
                         ;;
                     # Short options
-                    h)  myconfig_usage
-                        exit 0
-                        ;;
-		    d)  set -x
-			;;
-                    n)  DRY_RUN=1
+                    d)  set -x
                         ;;
                     f)  FORCE=1
                         ;;
+                    h)  myconfig_usage
+                        exit 0
+                        ;;
                     i)  INTERACTIVE=1
+                        ;;
+                    n)  DRY_RUN=1
                         ;;
                     v)  VERBOSE=1
                         ;;
