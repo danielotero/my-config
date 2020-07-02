@@ -57,7 +57,7 @@ function _err() {
     exit 1
 }
 
-# Prints a message only on debug
+# Prints a message only when verbose
 function _msg() {
     if [[ $VERBOSE == 1 ]]; then
         echo "$@"
@@ -373,6 +373,23 @@ function sysfiles_install() {
 ###############################################################################
 #                             Packages functions                              #
 ###############################################################################
+# Outputs a string with the current OS/Distribution
+function _get_distro() {
+    _verify_dependecy "grep"
+
+    local OS_RELEASE="/etc/os-release"
+    if [[ -f "$OS_RELEASE" ]]; then
+        local ID=$(grep "^ID=" $OS_RELEASE)
+        if [[ "$ID" ]]; then
+            echo ${ID#ID=}
+        else
+            echo "unkown"
+        fi
+    else
+        echo "unkown"
+    fi
+}
+
 function _init_package_system() {
     # Detect if the AUR helper is installed
     type -f "$MYCFG_PKG_AURHELPER" &> /dev/null
@@ -418,6 +435,11 @@ function _non_installed_packages() {
 }
 
 function package_install() {
+    if [[ "$(_get_distro)" != "arch" ]]; then
+        _info "Installed packages are only supported in Arch Linux. Skipping"
+        return
+    fi
+
     _init_package_system
     local total_packages=()
 
@@ -567,6 +589,9 @@ if [ "$0" = "$BASH_SOURCE" ]; then
 
     # Remove the backup file at exit
     trap "rm --force -- "$MYCFG_DTFL_TMP_FILE" "$MYCFG_PKG_TMP_FILE"" err exit
+
+    # Show user the detected distro
+    _msg "info: detected distribution '$(_get_distro)'"
 
     case "$MODE" in
         install)
