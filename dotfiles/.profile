@@ -29,3 +29,14 @@ if [ $(command -v gnome-keyring-daemon) ] && [ -z "$SSH_AUTH_SOCK" ]; then
     eval $(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh)
     export SSH_AUTH_SOCK
 fi
+
+#
+# Desktop environment
+#
+if [ "$(tty)" = "/dev/tty1" ]; then
+    if lsmod | grep "nvidia" &> /dev/null ; then
+        exec systemd-cat startx
+    else
+        exec systemd-cat sway
+    fi
+fi
