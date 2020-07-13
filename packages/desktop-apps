@@ -1,6 +1,5 @@
 ### Desktop programs
 # Web browsers
-chromium
 firefox
 
 # Multimedia
@@ -32,10 +31,19 @@ ntfs-3g
 mtools
 gpart
 
-# General desktop apps
-nautilus
+# File explorer
+gvfs
+gvfs-afc
+gvfs-gphoto2
+gvfs-mtp
+gvfs-smb
+thunar
+thunar-volman
+thunar-archive-plugin
+tumbler
+
+# Utilities
 evince
-gnome-terminal
 gnome-calculator
 gedit
 gedit-plugins
