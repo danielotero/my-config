@@ -26,7 +26,7 @@ git
 meld
 
 # Python
-python3
+python
 
 # Network
 openbsd-netcat
