@@ -335,6 +335,12 @@ function sysfiles_install() {
 
         while true; do
             if [[ -a "$dest" ]]; then
+                # Check if the file is the same
+                _verify_dependecy "cmp"
+                cmp --quiet "$item" "$dest"
+                if [[ $? == 0 ]]; then
+                    break
+                fi
                 echo -n "Do you like to overwrite the \"$dest\" system file? (Yes/No/Show/Diff/Quit) "
             else
                 echo -n "Do you like to install the \"$dest\" system file? (Yes/No/Show/Quit) "
