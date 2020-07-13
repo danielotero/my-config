@@ -1,0 +1,41 @@
+{
+    // Editor
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.detectIndentation": false,
+    "editor.fontFamily": "Fira Code",
+    "editor.fontLigatures": true,
+    "editor.tabSize": 2,
+    "files.insertFinalNewline": true,
+    "window.zoomLevel": 0,
+
+    // Telemetry
+    "telemetry.enableTelemetry": false,
+    "telemetry.enableCrashReporter": false,
+    "githubPullRequests.telemetry.enabled": false,
+
+    // Explorer
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+
+    // C++
+    "clangd.arguments": [
+      "--all-scopes-completion",
+      "--background-index",
+      "--clang-tidy",
+      "--completion-style=detailed",
+      "--header-insertion-decorators",
+      "--header-insertion=iwyu",
+      "--j=4",
+      "--suggest-missing-includes"
+    ],
+    "cmake.buildDirectory": "${workspaceFolder}/builds/${buildKit}-${buildType}",
+    "cmake.configureOnOpen": true,
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
+    "cmake.preferredGenerators": [ "Ninja", "Makefile" ],
+
+    // Rust
+    "rust-client.disableRustup": true,
+
+    // Unclassified
+    "": "",
+}
