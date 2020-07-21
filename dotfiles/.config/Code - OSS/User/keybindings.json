@@ -12,16 +12,6 @@
         "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
     },
     {
-        "key": "escape",
-        "command": "workbench.action.togglePanel",
-        "when": "activePanel"
-    },
-    {
-        "key": "escape",
-        "command": "workbench.action.maximizeEditor",
-        "when": "!activePanel && sideBarVisible"
-    },
-    {
         "key": "alt+left",
         "command": "workbench.action.navigateBack"
     },
@@ -34,5 +24,5 @@
         "key": "ctrl+shift+a",
         "command": "-editor.action.blockComment",
         "when": "editorTextFocus && !editorReadonly"
-    }
+    },
 ]
