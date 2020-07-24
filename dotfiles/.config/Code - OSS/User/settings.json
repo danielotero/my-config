@@ -33,6 +33,10 @@
     "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
     "cmake.preferredGenerators": [ "Ninja", "Makefile" ],
 
+    // Git
+    "gitlens.codeLens.authors.enabled": false,
+    "gitlens.codeLens.recentChange.enabled": false,
+
     // Rust
     "rust-client.disableRustup": true,
 
