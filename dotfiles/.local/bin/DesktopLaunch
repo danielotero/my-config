@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Special handler for Sway
-[ -z "${SWAYSOCK}" ] && exec swaymsg exec -- systemd-cat -- "${@}"
+[ "${SWAYSOCK}" ] && exec swaymsg exec -- systemd-cat -- "${@}"
 
 # Regular case
 exec systemd-cat -- "${@}"
