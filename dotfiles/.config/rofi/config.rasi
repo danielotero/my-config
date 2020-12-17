@@ -1,0 +1,11 @@
+configuration {
+	show-icons: true;
+	run-command: "DesktopLaunch {cmd}";
+	combi-modi: "drun,run";
+	hide-scrollbar: true;
+	combi-hide-mode-prefix: true;
+	kb-mode-next: "Tab";
+	kb-mode-previous: "Shift+Tab,ISO_Left_Tab";
+	kb-row-up: "Up";
+	kb-row-tab: "";
+}
