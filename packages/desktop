@@ -15,13 +15,13 @@ xf86-video-amdgpu
 xf86-video-nouveau
 xf86-video-vesa
 xorg-server
-xorg-server-xwayland
 xorg-setxkbmap
 xorg-xauth
 xorg-xinit
 xorg-xkill
 xorg-xmodmap
 xorg-xrandr
+xorg-xwayland
 
 # Launcher
 rofi
