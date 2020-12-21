@@ -232,8 +232,9 @@ for_window [class="Gnome-calculator"] floating enable
 #------------------------------------------------------------------------------
 # External programs
 #------------------------------------------------------------------------------
-exec_always --no-startup-id   ~/.config/i3/background.sh
+exec --no-startup-id          ~/.config/i3/background.sh
 exec --no-startup-id          ~/.config/i3/idle.sh
+exec --no-startup-id          ~/.config/i3/input.sh
 exec --no-startup-id          gnome-keyring-daemon --start --components=gpg,secrets,ssh
 # Polkit agent
 exec --no-startup-id          /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
