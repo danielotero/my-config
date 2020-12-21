@@ -1,0 +1,8 @@
+profile "Work standalone" {
+  output "Unknown 0x0050 0x00000000" scale 1 position 0,0
+}
+
+profile "Work from home" {
+  output "Unknown 0x0050 0x00000000" scale 1.5 position 0,700
+  output "Goldstar Company Ltd LG ULTRAWIDE 0x0000E3EA" position 1280,0
+}

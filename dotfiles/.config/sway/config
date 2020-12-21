@@ -1,10 +1,10 @@
 # Reuse the i3 configuration
-include ~/.config/i3/config
+include                       ~/.config/i3/config
 
 # Default input configuration
 input * {
     # Spanish by default
-    xkb_layout es
+    xkb_layout                es
 
     # disable-while-typing
     dwt                       enabled
@@ -17,5 +17,8 @@ input * {
 for_window [app_id="gnome-calculator"] floating enable
 for_window [app_id="firefox"] move container to workspace $WS_WEB; workspace $WS_WEB
 
+# Automatic output profiles
+exec                          kanshi
+
 # Custom host configuration
-include ~/.config/sway/`hostname`
+include                       ~/.config/sway/`hostname`
