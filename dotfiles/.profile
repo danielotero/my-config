@@ -34,8 +34,13 @@ fi
 # Desktop environment
 #
 if [ "$(tty)" = "/dev/tty1" ]; then
-    if lsmod | grep "nvidia" &> /dev/null ; then
-        exec systemd-cat startx
+    if grep "nvidia" /proc/modules &> /dev/null; then
+        if grep "amdgpu" /proc/modules &> /dev/null; then
+            # Allow sway with hybrid amd/nvidia situations (it works for me!)
+            exec systemd-cat sway --my-next-gpu-wont-be-nvidia
+        else
+            exec systemd-cat startx
+	fi
     else
         exec systemd-cat sway
     fi
