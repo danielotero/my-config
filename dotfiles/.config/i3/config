@@ -44,10 +44,10 @@ floating_modifier             $MOD
 
 # Basic
 bindsym $MOD+q                kill
-bindsym $MOD+Return           exec $TERM
-bindsym $MOD+space            exec $MENU
+bindsym $MOD+Return           exec DesktopLaunch $TERM
+bindsym $MOD+space            exec DesktopLaunch $MENU
 bindsym $MOD+Shift+r          reload
-bindsym $MOD+Shift+q          exec --no-starup-id $EXIT
+bindsym $MOD+Shift+q          exec $EXIT
 
 # Move the focus
 bindsym $MOD+$LEFT            focus left
@@ -216,13 +216,13 @@ bindsym $MOD+y                bar mode toggle
 set $WS_IDE                   "IDE"
 bindcode $MOD+49              workspace $WS_IDE
 bindcode $MOD+Shift+49        move container to workspace $WS_IDE
-for_window [class="QtCreator"] move container to workspace $WS_IDE; workspace $WS_IDE
+for_window [class="QtCreator"] move container to workspace $WS_IDE, workspace $WS_IDE
 
 set $WS_WEB                   "Web"
 bindsym $MOD+w                workspace $WS_WEB
 bindsym $MOD+Shift+w          move container to workspace $WS_WEB
-for_window [class="Firefox"]  move container to workspace $WS_WEB; workspace $WS_WEB
-for_window [class="Chromium"] move container to workspace $WS_WEB; workspace $WS_WEB
+for_window [class="Firefox"]  move container to workspace $WS_WEB, workspace $WS_WEB
+for_window [class="Chromium"] move container to workspace $WS_WEB, workspace $WS_WEB
 
 #------------------------------------------------------------------------------
 # Custom window rules
