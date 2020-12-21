@@ -1,7 +1,9 @@
 #!/bin/sh
 
-# Special handler for Sway
-[ "${SWAYSOCK}" ] && exec swaymsg exec -- systemd-cat -- "${@}"
+# swaymsg exec has a bug (looks like in join_args) that prevents forwarding
+# program arguments correctly
+## Special handler for Sway
+#[ "${SWAYSOCK}" ] && exec swaymsg exec -- systemd-cat -- "${@}"
 
 # Regular case
 exec systemd-cat -- "${@}"
